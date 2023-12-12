@@ -21,11 +21,22 @@
  function findSearchTermInBooks(searchTerm, scannedTextObj) {
     /** You will need to implement your search and 
      * return the appropriate object here. */
-
     var result = {
-        "SearchTerm": "",
+        "SearchTerm": searchTerm,
         "Results": []
     };
+    scannedTextObj.forEach((book) => {
+        book["Content"].forEach((content) => {
+            if(content["Text"].includes(searchTerm)){
+                subResult = {
+                    "ISBN": book["ISBN"],
+                    "Page": content["Page"],
+                    "Line": content["Line"]
+                };
+                result["Results"].push(subResult);
+            }
+        });
+    });
     
     return result; 
 }
@@ -66,6 +77,108 @@ const twentyLeaguesOut = {
         }
     ]
 }
+const appleBookIn = [
+    {
+        "Title": "A Book About Apples",
+        "ISBN": "00000000001",
+        "Content": [
+            {
+                "Page": 1,
+                "Line": 8,
+                "Text": "apples are a terrific fruit. they can be many colors "
+            },
+            {
+                "Page": 1,
+                "Line": 9,
+                "Text": "and are quite popular among children "
+            },
+            {
+                "Page": 2,
+                "Line": 10,
+                "Text": "a dish made of the fruit is applesauce"
+            } ,
+            {
+                "Page": 3,
+                "Line": 4,
+                "Text": "let's try random caps: Apple APPLE aPPlE applEs"
+            },
+            {
+                "Page": 3,
+                "Line": 10,
+                "Text": "what a majectic fruit the pear is, oh wait that is not an apple"
+            } ,
+            {
+                "Page": 4,
+                "Line": 1,
+                "Text": "now let's try the word with spaces a p p l e"
+            } 
+        ] 
+    }
+]
+
+const apple3Out = {
+    "SearchTerm": "apple",
+    "Results": [
+        {
+            "ISBN": "00000000001",
+            "Page": 1,
+            "Line": 8
+        },
+        {
+            "ISBN": "00000000001",
+            "Page": 2,
+            "Line": 10
+        },
+        {
+            "ISBN": "00000000001",
+            "Page": 3,
+            "Line": 10
+        },
+    ]
+}
+
+const apple4Out =  {
+    "SearchTerm": "let's try",
+    "Results": [
+        {
+            "ISBN": "00000000001",
+            "Page": 3,
+            "Line": 4
+        },
+        {
+            "ISBN": "00000000001",
+            "Page": 4,
+            "Line": 1
+        }
+    ]
+}
+
+const applesAndLeaguesOut = {
+    "SearchTerm": "and",
+    "Results": [
+        {
+            "ISBN": "00000000001",
+            "Page": 1,
+            "Line": 9
+        },
+        {
+            "ISBN": "00000000001",
+            "Page": 3,
+            "Line": 4
+        },
+        {
+            "ISBN": "9780000528531",
+            "Page": 31,
+            "Line": 9
+        },
+        {
+            "ISBN": "9780000528531",
+            "Page": 31,
+            "Line": 10
+        }
+    ]
+
+}
 
 /*
  _   _ _   _ ___ _____   _____ _____ ____ _____ ____  
@@ -101,4 +214,56 @@ if (test2result.Results.length == 1) {
     console.log("FAIL: Test 2");
     console.log("Expected:", twentyLeaguesOut.Results.length);
     console.log("Received:", test2result.Results.length);
+}
+
+/* Test 3: General function test, includes case-sensitive cases */
+const test3Result = findSearchTermInBooks("apple", appleBookIn);
+if(JSON.stringify(apple3Out) === JSON.stringify(test3Result)){
+    console.log("PASS: Test 3");
+} else {
+    console.log("FAIL: Test 3");
+    console.log("Expected:", apple3Out);
+    console.log("Received:", test3Result);
+}
+
+/* Test 4: Multiple word test */
+const test4Result = findSearchTermInBooks("let's try", appleBookIn);
+if(JSON.stringify(apple4Out) === JSON.stringify(test4Result)){
+    console.log("PASS: Test 4");
+} else {
+    console.log("FAIL: Test 4");
+    console.log("Expected:", apple4Out);
+    console.log("Received:", test4Result);
+}
+
+/* Test 5: No matches test with some input */ 
+const test5Result = findSearchTermInBooks("orange", appleBookIn);
+if(test5Result.Results.length == 0){
+    console.log("PASS: Test 5")
+} else {
+    console.log("FAIL: Test 5");
+    console.log("Expected:", JSON.stringify({"SearchTerm": "orange",
+    "Results": []}));
+    console.log("Received:", test5Result);
+}
+
+/* Test 6: Multiple books general test*/
+const test6Result = findSearchTermInBooks("and", [appleBookIn[0], twentyLeaguesIn[0]]);
+if(JSON.stringify(applesAndLeaguesOut) === JSON.stringify(test6Result)){
+    console.log("PASS: Test 6")
+} else {
+    console.log("FAIL: Test 6");
+    console.log("Expected:", applesAndLeaguesOut);
+    console.log("Received:", test6Result);
+}
+
+/* Test 7: Empty Book */
+const test7Result = findSearchTermInBooks("a", []);
+if(test7Result.Results.length == 0){
+    console.log("PASS: Test 7")
+} else {
+    console.log("FAIL: Test 7");
+    console.log("Expected:", JSON.stringify({"SearchTerm": "a",
+    "Results": []}));
+    console.log("Received:", test7Result);
 }
